@@ -7,27 +7,61 @@ error_reporting($reportingLevel);
   
   //////// GET
   function getStatistik ($connection, $id_azubi) {
-    $sqlStmt = "SELECT * FROM statistik
-                WHERE fk_azubi = '$id_azubi'";
-    $result =  mysqli_query($connection, $sqlStmt);
-    
+    $sqlStmt = "SELECT * 
+                FROM statistik
+                WHERE fk_azubi = '$id_azubi'"; 
+
     $data = array();
     
     if ($result = $connection->query($sqlStmt)) {
+      $stat = array();
+
         while ($row = $result->fetch_assoc()) {
-    
-            $id = $row["id"];
-            $timestamp = $row["log"];
-            $fehlerq = $row["fehlerquote"];
-            $avgz = $row["avgzeit"];
-             
-            array_push($data, array("id"=>$id, "log"=>$timestamp, "fehlerquote"=>$fehlerq, "avgzeit"=>$avgz));
-          }
-    
-      genJson($data);
-    }else{
-      echo mysqli_error($connection);
-    }
+          $pflanze = array();
+
+          $id_statistik = $row["id"];
+          $timestamp = $row["log"];
+          $fehlerq = $row["fehlerquote"];
+          $zeit = $row["quizzeit"];
+          $id_b_pflanze = $row["fk_beste_pflanze"];
+
+          array_push($data, array("id_statistik"=>$id_statistik, "erstellt"=>$timestamp, "fehlerquote"=>$fehlerq, "zeit"=>$zeit, "id_beste_pflanze"=>$id_b_pflanze));
+
+          $sqlStmt = "SELECT fk_pflanze
+                      FROM stat_einzel
+                      WHERE fk_statistik = '$id_statistik'";
+
+          if ($result2 = $connection->query($sqlStmt)) {
+            while ($row = $result2->fetch_assoc()) {
+              $id_pflanze = $row["fk_pflanze"];
+
+              $sqlStmt = "SELECT se.fk_pflanze, pk.kat_name, sed.eingabe, sed.korrekt FROM stat_einzel se
+              JOIN stat_einzel_detail sed ON se.fk_statistik = sed.fk_statistik 
+              JOIN p_kategorien pk ON sed.fk_kategorie = pk.id
+              WHERE se.fk_statistik = '$id_statistik' AND sed.fk_pflanze = '$id_pflanze'";
+
+              if ($result3 = $connection->query($sqlStmt)) {
+                while ($row = $result3->fetch_assoc()) {
+                  $kategorie = $row["kat_name"];
+                  $eingabe = $row["eingabe"];
+                  $korrekt = $row["korrekt"];
+                }
+
+                array_push($data, array("id_pflanze"=>$id_pflanze, "kategorie"=>$kategorie, "eingabe"=>$eingabe, "korrekt"=>$korrekt));
+
+              }//END IF
+            }//END WHILE
+          }//END IF
+        }//END WHILE
+
+        $result->free();
+        $result2->free();
+        $result3->free();
+        genJson($data);
+      }
+      else{
+        echo mysqli_error($connection);
+      }
     closeConnection($connection);
   }
 
@@ -41,7 +75,27 @@ error_reporting($reportingLevel);
       }
       closeConnection($connection);
   }
+  ///
+  ///// INSERT - Einzel
+  function createStatEinzel($connection, $id_stat, $id_pflanze, $id_kategorie) {
+    $sqlStmt = "INSERT into stat_einzel (fk_statistik, fk_pflanze, benoetigte_zeit) VALUES ('$id_stat', '$id_pflanze')";
+                
+    if (!$connection->query($sqlStmt)) {
+      echo mysqli_error($connection);
+    }
+    closeConnection($connection);
+  }
 
+  //////// INSERT - Einzel - Details
+  function createStatEinzelDetail($connection, $id_stat, $id_pflanze, $id_kategorie, $eingabe) {
+    $sqlStmt = "INSERT INTO stat_einzel_detail (fk_statistik, fk_pflanze, fk_kategorie, eingabe, korrekt
+    VALUES('$id_stat', '$id_pflanze', '$id_kategorie', '$eingabe', (SELECT antwort from p_antworten WHERE fk_kategorie = '$id_kategorie' AND $fk_pflanze = '$id_pflanze'))";
+                
+    if (!$connection->query($sqlStmt)) {
+      echo mysqli_error($connection);
+    }
+    closeConnection($connection);
+  }
   //////// UPDATE
   function updateStatistik($connection, $id_stat, $fehler, $zeit, $id_pflanze) {
     $sqlStmt = "UPDATE statistik 
@@ -53,52 +107,4 @@ error_reporting($reportingLevel);
     }
     closeConnection($connection);
 }
-
-  ////////////////////// STATISTIK - DETAILS
-  function getStatDetails ($connection, $id_statistik) {
-      $sqlStmt = "SELECT * FROM statistik_details WHERE fk_statistik = '$id_statistik'";
-      $result =  mysqli_query($connection, $sqlStmt);
-      
-      $data = array();
-      
-      if ($result = $connection->query($sqlStmt)) {
-          while ($row = $result->fetch_assoc()) {
-      
-            // Daten werden der Reihe nach abgerufen und an Variablen gebunden.       
-            $id_pflanze = $row["fk_pflanze"];// -> "id_pflanze" wird gefühllt mit daten aus "fk_pflanze" in der aktuellen reihe"
-            $logtime = $row["log"];        
-            $bzeit= $row["benoetigte_zeit"];
-            $eingabe  = $row["eingabe"];
-            $korrekt = $row["korrekt"];
-
-            // Array wird mit Daten gefüllt 
-            array_push($data, array("id_pflanze" =>$id_pflanze, 
-                                    "erstellt" =>$logtime, 
-                                    "benoetigte zeit "=>$bzeit,
-                                    "eingabe" => $eingabe, 
-                                    "korrekt"=>$korrekt));
-
-            
-          }
-      
-        genJson($data);   // Übergabe zur Json konvertierung
-      }else{
-        echo mysqli_error($connection);
-      }
-      closeConnection($connection);
-  }
-
-  //////// INSERT
-  function createStatDetails($connection, $id_stat, $id_pflanze, $id_kategorie, $zeit, $eingabe) {
-    $sqlStmt = "INSERT into statistik_details (fk_statistik, fk_pflanze, fk_kategorie
-                                               benoetigte_zeit, eingabe, korrekt)
-
-                VALUES ('$id_stat', '$id_pflanze', '$id_kategorie', '$zeit', '$eingabe', (SELECT from p_antworten WHERE fk_kategorie = '$id_kategorie' AND $fk_pflanze = '$id_pflanze'))";
-  
-    if (!$connection->query($sqlStmt)) {
-      echo mysqli_error($connection);
-    }
-    closeConnection($connection);
-}
-
 ?>

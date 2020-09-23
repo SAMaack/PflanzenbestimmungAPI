@@ -3,11 +3,10 @@ $reportingLevel = -1; //0 für alle PHP Fehler und Warungen ausblenden, -1 für 
 error_reporting($reportingLevel); 
 
 
-//ÜBERABEITUNG ZU AUSGABE VON ALLEN DATEN?
+
+////// ABFRAGE PFLANZEN + KATEGORIEN UND ANTWORTEN
 function getPflanzen($connection) {
     $sqlStmt = "SELECT * FROM pflanze";
-    $result =  mysqli_query($connection, $sqlStmt);
-
     $data = array();
 
     if ($result = $connection->query($sqlStmt)) {
@@ -16,20 +15,41 @@ function getPflanzen($connection) {
         $id = $row["id"];
         $zier = $row["zierbau"];
         $gala = $row["galabau"];
-     
-        array_push($data,array("id"=> $id, "zierplanzenbau"=>$zier, "gartenlandschaftsbau"=>$gala));
-      }
 
+        $sqlStmt2 = "SELECT pk.id as id_kat, pk.kat_name, pk.abfrage, pa.antwort FROM p_antworten pa
+                    INNER JOIN p_kategorien pk
+                    ON pk.id = pa.fk_kategorie
+                    WHERE fk_pflanze = '$id'";
+
+        $antworten = array();
+
+        if($result2 = $connection->query($sqlStmt2)) {
+          while ($row = $result2->fetch_assoc()) {
+
+            $idkat = $row["id_kat"];
+            $katname = $row["kat_name"];
+            $abfrage = $row["abfrage"];
+            $antwort = $row["antwort"];
+
+            array_push($antworten, array("kategorie_id"=>$idkat, "kategorie_name"=>$katname, "abfrage"=>$abfrage, "antwort"=>$antwort));
+          }
+        }
+
+        array_push($data, array("id_pflanze"=> $id, "zierpflanzenbau"=>$zier, "gartenlandschaftsbau"=>$gala, $antworten));
+      }
       genJson($data); //Verarbeitung zu json
     }
-    else{
+    else
+    {
       echo mysqli_error($connection);
     }
     closeConnection($connection);
 }
+   
 
+/*
 
-
+*/
   /* args Inhalt
   array(1) { 
     [0]=> array(30) { 
@@ -42,6 +62,8 @@ function getPflanzen($connection) {
 
   */
 
+
+////// ERSTELLUNG VON EINER PFLANZE UND DEREN ANTWORTEN
 function createPflanze($connection, $args) {
 
   $sqlLock  = "LOCK TABLES pflanze WRITE";  //Table sperren, damit dir LAST_INSERT_ID nicht gleich überschrieben wird.
@@ -99,5 +121,62 @@ function createPflanze($connection, $args) {
 
   closeConnection($connection); //Verbindung schließen
 } // FUNKTIONS ENDE
+
+/////// PFLANZE LÖSCHEN
+
+function deletePflanze($connection, $id) {
+  $sqlStmt = "DELETE FROM pflanze
+              WHERE id = '$id'";
+
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
+}
+
+/////// ABFRAGE PFLANZEN BILDER
+function getPBilder($connection, $id_pflanze) {
+  $sqlStmt = "SELECT * FROM p.bilder WHERE $fk_pflanze = '$id_pflanze'";
+
+  $data = array();
+
+  if ($result = $connection->query($sqlStmt)) {
+    while ($row = $result->fetch_assoc()) {
+      $id = $row["id"];
+      $bild = $row["bild"];
+      
+      array_push($data, array("id_bild"=>$id, "bild"=>$bild));
+    }
+
+    genJson($data);
+  }
+  else {
+    echo mysqli_error($connection);
+  }
+  $result->free();
+  closeConnection($connection);
+}
+
+//////// INSERT
+function createPBild($connection, $id_pflanze, $bild) {
+  $sqlStmt = "INSERT INTO p_bilder (fk_pflanze, bild) 
+              VALUES ('$id_pflanze', '$bild')";
+
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
+}
+
+//////// DELETE
+function deletePBild($connection, $id) {
+  $sqlStmt = "DELETE FROM p_bilder
+              WHERE id = '$id'";
+
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
+}
 
 ?>

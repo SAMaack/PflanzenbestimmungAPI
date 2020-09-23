@@ -13,11 +13,12 @@ function getKategorien($connection) {
 
             $id = $row["id"];
             $katName = $row["kat_name"];
+            $abfrage = $row["abfrage"];
 
-        array_push($data,array("id"=>$id, "kategorie"=>$katName));
+        array_push($data,array("id"=>$id, "kategorie"=>$katName, "abfrage"=>$abfrage));
       }
       
-
+      $result->free();
       genJson($data); //Verarbeitung zu json
     }else{
       echo mysqli_error($connection);
@@ -34,6 +35,28 @@ function createKategorie($connection, $kat_name) {
       echo mysqli_error($connection);
     }
     closeConnection($connection);
+}
+
+  //////// UPDATE - TODO
+  function updateKategorie($connection, $id, $kat_name) {
+    $sqlStmt = "UPDATE p_kategorien SET kat_name = '$kat_name'
+                WHERE id = 'id'";
+
+    if (!$connection->query($sqlStmt)) {
+      echo mysqli_error($connection);
+    }
+    closeConnection($connection);
+}
+
+  //////// DELETE
+function deleteKategorie($connection, $id) {
+  $sqlStmt = "DELETE FROM p_kategorien
+              WHERE id = '$id'";
+
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
 }
 
 ?>

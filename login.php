@@ -12,13 +12,18 @@ function getLogin($connection,$username,$pw){
     if ($result1 = $connection->query($sqlStmt)) {
   
       while ($row = $result1->fetch_assoc()) {
+        $id = $row["id"];
         $name = $row["name"];
         $vorname = $row["vorname"];
+        $ausbilder = $row["fk_ausbilder"];
         $ausbildungsart = $row["fk_ausbildungsart"];
         $fachrichtung=$row["fk_fachrichtung"];
+        $quizart = $row["fk_quiz_art"];
+        $pruefbool = $row["pruefung"];
+        
   
-        array_push($azubis,array("name"=>$name, "vorname" =>$vorname,
-                                 "ausbildung"=>$ausbildungsart,"fachrichtung"=>$fachrichtung));
+        array_push($azubis,array("id"=>$id, "name"=>$name, "vorname" =>$vorname, "id_ausbilder"=>$ausbilder, 
+                                 "id_ausbildung"=>$ausbildungsart,"id_fachrichtung"=>$fachrichtung, "id_quiz_art"=>$quizart, "bool_pruefung"=>$pruefbool)); 
       }
     }
     else{
@@ -33,16 +38,20 @@ function getLogin($connection,$username,$pw){
     if ($result2 = $connection->query($sqlStmt2)){
   
       while ($row = $result2->fetch_assoc()) {
+          $id = $row["id"];
           $nutzer = $row["nutzername"];
           $berflag = $row["berflag"];
   
-          array_push($admins,array("nutzername"=>$nutzer, "berflag"=>$berflag));
+          array_push($admins,array("id"=>$id, "nutzername"=>$nutzer, "berflag"=>$berflag));
+        
       }
     }
   
     else{
       echo mysqli_error($connection);
     }
+    $result1->free();
+    $result2->free();
     closeConnection($connection);
   
   

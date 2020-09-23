@@ -16,9 +16,10 @@ function getAdmins ($connection) {
             $berflag = $row["berflag"];
     
             array_push($data,array("id"=>$id, "nutzername"=>$nutzer, "berflag"=>$berflag));
-          }
-
-      genJson($data);
+        }
+      
+        $result->free();
+        genJson($data);
     }else{
       echo mysqli_error($connection);
     }

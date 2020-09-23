@@ -24,7 +24,7 @@ function getAzubis ($connection) {
             $pruefung= $row["pruefung"];
       
             array_push($data, array("id"=>$id, "name"=>$name, "vorname" =>$vorname, "nutzername"=>$nutzer, 
-                                     "ausbildung"=>$ausbildungsart,"fachrichtung"=>$fachrichtung, "quiz-art"=>$idquizart, "pruefung"=>$pruefung));
+                                     "ausbildungsart"=>$ausbildungsart,"fachrichtung"=>$fachrichtung, "id_quiz-art"=>$idquizart, "pruefung"=>$pruefung));
           }
   
       genJson($data);
@@ -34,16 +34,54 @@ function getAzubis ($connection) {
     closeConnection($connection);
   }
 
-  //create
-
-//CREATE
-
+///////// CREATE
 function createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname) {
   $sqlStmt = "INSERT into azubis(nutzername, passwort, vorname, name, fk_ausbilder, fk_ausbildungsart, fk_fachrichtung) 
   values ('$nutzername', '$pw', '$vorname', '$name', '$ausbilder', '$ausbildungsart', '$fachrichtung')";
 
-              //Error-Abfrage?
-  $connection->query($sqlStmt);
+  if (!$connection->query($sqlStmt)){
+    echo mysqli_error($connection);
+  }
   closeConnection($connection);
 }
+
+///////// UPDATE
+function updateAzubi($connection, $args) {
+  
+  $sqlStmt = "UPDATE azubis SET ";
+
+  for ($i = 1; $i < count($args); $i += 2) {
+    $i2 = $i + 1; //Zur selektierung von zweitem Paramter.
+
+    //Parameter Check
+    if ($args[$i] == 'fk_ausbilder' ||         
+        $args[$i] == 'fk_ausbildungsart' ||
+        $args[$i] == 'fk_quizart' || 
+        $args[$i] == "nutzername" || 
+        $args[$i] == 'passwort' || 
+        $args[$i] == 'name' || 
+        $args[$i] == 'vorname' || 
+        $args[$i] == 'pruefung') {
+
+      //Statement Erweiterung, solange Parameter vorhanden.
+      $sqlStmt .= "$args[$i] = '$args[$i2]'"; //$args[$i] = Ziel | $args[$i2] = Wert  || z.B.: name = Banane  
+    }
+
+    //Addition von Seperator, falls noch mehr Argumente vorhanden.
+    if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+    }
+  }
+  
+  $sqlStmt .= " WHERE id = '$args[0]'";
+
+  //Error-Ausgabe, falls nicht Erfolgreich
+  if (!$connection->query($sqlStmt)){
+    echo mysqli_error($connection);     
+  }
+
+  closeConnection($connection); //Verbindung schließen 
+} // FUNKTIONS ENDE
+
+
 ?>
