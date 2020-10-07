@@ -10,6 +10,9 @@ INCLUDE ('pflanzen.php');
 INCLUDE ('statistik.php');
 INCLUDE ('quiz.php');
 INCLUDE ('kategorien.php');
+INCLUDE ('abgefragt.php');
+INCLUDE ('fachrichtung.php');
+INCLUDE ('ausbildungsart.php');
 
 $method =  $_POST['method']; 
 
@@ -21,6 +24,13 @@ switch ($method) {
     getLogin($connection,$username,$pw);
   break;
 
+  case 'getFachrichtung':
+    getFachrichtungen($connection);
+  break;
+
+  case 'getAusbildungsart':
+    getAusbildungsart($connection);
+  break;
 
   //////// ADMIN //////// 
   case 'getAdmins':
@@ -30,16 +40,26 @@ switch ($method) {
   case 'createAdmin':
     $username = $_POST['User'];
     $pw = $_POST['PW'];
+    $name = $_POST['Name'];
+    $vorname = $_POST['Vorname'];
 
-    createAdmin($connection, $nutzername, $pw);
+    createAdmin($connection, $username, $pw, $name, $vorname);
   break;
 
   case 'updateAdmin':
-    $id_admin  = $_POST['ID'];
+    $id_admin  = $_POST['IDad'];
     $username = $_POST['User'];
     $pw = $_POST['PW'];
+    $name = $_POST['Name'];
+    $vorname = $_POST['Vorname'];
 
-    updateAdmin($connection, $id_admin, $username, $pw);
+    updateAdmin($connection, $id_admin, $username, $pw, $name, $vorname);
+  break;
+
+  case 'deleteAdmin':
+    $id_admin  = $_POST['IDad'];
+
+    deleteAdmin($connection, $id_admin);
   break;
 
   //////// AZUBI //////// 
@@ -47,11 +67,23 @@ switch ($method) {
     getAzubis($connection);
   break;
 
+  case 'createAzubi':
+    $ausbilder = $_POST['IDab'];
+    $ausbildungsart = $_POST['IDaa'];
+    $fachrichtung = $_POST['IDf'];
+    $nutzername = $_POST['User'];
+    $pw = $_POST['PW'];
+    $name = $_POST['Name'];
+    $vorname = $_POST['Vorname'];
+
+    createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname);
+  break;
+
   case 'updateAzubi':   
     $args = array();
     foreach($_POST as $key => $value) {  // Als erster Parameter wird die ID des Azubis erwartet, danach dass oder die Ziele und Werte
-        if ($key = 'IDa') {
-          array_push($args, "fk_ausbilder", $_POST['IDa']);
+        if ($key = 'IDab') {
+          array_push($args, "fk_ausbilder", $_POST['IDab']);
         }
         else if($key = 'IDaa') {
           array_push($args, "fk_ausbildungsart", $_POST['IDaa']);
@@ -79,6 +111,12 @@ switch ($method) {
     updateAzubi($connection, $args);
   break;
 
+  case 'deleteAzubi':
+    $IDaz = $_POST['IDaz'];
+
+    deleteAzubi($connection, $IDaz);
+  break;
+
   //////// KATEGORIEN //////// 
 
   case 'getKategorien':
@@ -94,7 +132,7 @@ switch ($method) {
     $id  = $_POST['IDk'];
     $kat_name  = $_POST['Kategorie'];
     updateKategorien($connection, $id, $kat_name);
-  break;
+  break; 
 
   case 'deleteKategorie':
     $id  = $_POST['IDk'];
@@ -118,9 +156,15 @@ switch ($method) {
     createPflanze($connection, $args);
   break;
 
+  case 'deletePflanze':
+    $IDp = $_POST['IDp'];
+
+    deletePflanze($connection, $IDp);
+  break;
+
   //////// PFLANZEN - BILDER //////// 
   case 'getPBilder':
-    $id_pflanze = $_POST['IDpb'];
+    $id_pflanze = $_POST['IDp'];
     getPBilder($connection, $id_pflanze);
   break;
 
@@ -138,13 +182,18 @@ switch ($method) {
   //////// STATISTIK //////// 
 
   case 'getStatistik':
-    $id_azubi  = $_POST['IDa'];
+    $id_stat  = $_POST['IDs'];
 
-    getStatistik($connection, $id_azubi);
+    getStatistik($connection, $id_stat);
+  break;
+
+  case 'getStatList':
+    $id_azubi  = $_POST['IDaz'];
+    getStatList($connection, $id_azubi);
   break;
 
   case 'createStatistik':
-    $id_azubi  = $_POST['IDa'];
+    $id_azubi  = $_POST['IDaz'];
     $fehlerquote = $_POST['FQuote'];
     $quizzeit = $_POST['Zeit'];
     $id_pflanze  = $_POST['IDp'];
@@ -153,15 +202,6 @@ switch ($method) {
   break;
 
   case 'createStatEinzel':
-    $id_stat  = $_POST['IDs'];
-    $id_kategorie = $_POST['IDk'];
-    $id_pflanze  = $_POST['IDp'];
-
-
-    createStatEinzel($connection, $id_stat, $id_pflanze, $id_kategorie);
-  break;
-
-  case 'createStatEinzelDetail':
     $id_stat  = $_POST['IDs'];
     $id_kategorie = $_POST['IDk'];
     $id_pflanze  = $_POST['IDp'];
@@ -178,27 +218,6 @@ switch ($method) {
 
     updateStatistik($connection, $id_stat, $fehlerquote, $quizeit, $id_pflanze);
 
-  break;
-
-  //////// STATISTIK - DETAILS //////// 
-  case 'getStatDetails':
-    $id_stat = $_POST['IDs'];
-
-    getStatDetails($connection, $id_Stat);
-  break;  
-
-  case 'createStatDetails':
-
-    //ÜBERGABE WERTE
-    $id_stat = $_POST['IDs'];
-    $id_pflanze = $_POST['IDp'];
-    $id_kategorie = $_POST['IDk'];
-    $zeit = $_POST['Zeit'];
-    $eingabe = $_POST['Eingabe'];
- 
-    //AUFRUF VON FUNKTION
-    createStatDetails($connection, $id_stat, $id_pflanze, $id_kategorie, $zeit, 
-                                   $eingabe);
   break;
 
   //////// QUIZ - ART ////////
@@ -226,12 +245,12 @@ switch ($method) {
 
   //////// QUIZ - PLANZEN - ZUWEISUNG ////////
   case 'getQuizPZuweisung':
-    $id_azubi = $_POST['IDa'];
+    $id_azubi = $_POST['IDaz'];
     getQuizPZuweisung($connection, $id_azubi);
   break;
 
   case 'createQuizPZuweisung':
-    $id_azubi = $_POST['IDa'];
+    $id_azubi = $_POST['IDaz'];
     $id_pflanze = $_POST['IDp'];
     createQuizPZuweisung($connection, $id_azubi, $id_pflanze);
   break;
@@ -241,9 +260,34 @@ switch ($method) {
     $id_pflanze = $_POST['IDp'];
     deleteQuizPZuweisung($connection, $id_azubi, $id_pflanze);
   break;
+
+  case 'getAbgefragt':
+    $id_azubi = $_POST['IDa'];
+    getAbgefragt($connection, $id_azubi);
+  break;
+
+  //////// ABGEFRAGT ////////
+
+  case 'createAbgefragt':
+    $id_azubi = $_POST['IDa'];
+    $id_pflanze = $_POST['IDp'];
+    $counter = $_POST['Counter'];
+    $gelernt = $_POST['Gelernt'];
+
+    createAbgefragt($connection, $id_azubi, $id_pflanze, $counter, $gelernt);
+  break;
+  
+  case 'updateAbgefragt':
+    $id_azubi = $_POST['IDa'];
+    $id_pflanze = $_POST['IDp'];
+    $counter = $_POST['Counter'];
+    $gelernt = $_POST['Gelernt'];
+    
+    updateAbgefragt($connection, $id_azubi, $id_pflanze, $counter, $gelernt);
+  break;
 } 
 
-//Umwandeln in und Ausgabe von Daten als JSON
+//Umwandeln und Ausgabe von Daten als JSON
 function genJson($data) {
   $myJSON = json_encode($data);
     echo $myJSON;

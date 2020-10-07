@@ -124,9 +124,9 @@ function createPflanze($connection, $args) {
 
 /////// PFLANZE LÖSCHEN
 
-function deletePflanze($connection, $id) {
+function deletePflanze($connection, $IDp) {
   $sqlStmt = "DELETE FROM pflanze
-              WHERE id = '$id'";
+              WHERE id = '$IDp'";
 
   if (!$connection->query($sqlStmt)) {
     echo mysqli_error($connection);
@@ -136,7 +136,7 @@ function deletePflanze($connection, $id) {
 
 /////// ABFRAGE PFLANZEN BILDER
 function getPBilder($connection, $id_pflanze) {
-  $sqlStmt = "SELECT * FROM p.bilder WHERE $fk_pflanze = '$id_pflanze'";
+  $sqlStmt = "SELECT * FROM p_bilder WHERE fk_pflanze = '$id_pflanze'";
 
   $data = array();
 
@@ -149,6 +149,28 @@ function getPBilder($connection, $id_pflanze) {
     }
 
     genJson($data);
+  }
+  else {
+    echo mysqli_error($connection);
+  }
+  $result->free();
+  closeConnection($connection);
+}
+
+/////// ABFRAGE PFLANZEN BILDER
+function testGetPBilder($connection, $id_pflanze) {
+  $sqlStmt = "SELECT * FROM p_bilder WHERE fk_pflanze = '$id_pflanze'";
+
+  $data = array();
+
+  if ($result = $connection->query($sqlStmt)) {
+    while ($row = $result->fetch_assoc()) {
+      $id = $row["id"];
+      $bild = $row["bild"];
+
+      echo '<img src="data:image/jpeg;base64,'.base64_encode($bild) .'" />';
+    }
+
   }
   else {
     echo mysqli_error($connection);

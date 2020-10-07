@@ -3,10 +3,10 @@ $reportingLevel = -1; //0 für alle PHP Fehler und Warungen ausblenden, -1 für 
 error_reporting($reportingLevel); 
 
 function getAzubis ($connection) {
-    $sqlStmt = "SELECT az.id, az.fk_quiz_art, az.fk_ausbilder, az.nutzername, az.name, 
-                       az.vorname, az.pruefung, aa.name as ausbildungsart, fa.name as fachrichtung 
-                FROM azubis az, ausbildungsart aa, fachrichtung fa
-                WHERE aa.id = az.fk_ausbildungsart AND az.fk_fachrichtung = fa.id";
+    $sqlStmt = "SELECT az.id, az.fk_quiz_art, ad.name, az.nutzername, az.name, 
+                       az.vorname, az.pruefung, aa.name as ausbildungsart, fa.name as fachrichtung, (CONCAT(ad.vorname,' ', ad.name)) AS ausbilder  
+                FROM azubis az, ausbildungsart aa, fachrichtung fa, admins ad
+                WHERE aa.id = az.fk_ausbildungsart AND az.fk_fachrichtung = fa.id AND ad.id = az.fk_ausbilder";
     $result =  mysqli_query($connection, $sqlStmt);
   
     $data = array();
@@ -19,12 +19,13 @@ function getAzubis ($connection) {
             $nutzer = $row["nutzername"];
             $name = $row["name"];
             $vorname = $row["vorname"];
+            $ausbilder = $row["ausbilder"];
             $ausbildungsart = $row["ausbildungsart"];
             $fachrichtung= $row["fachrichtung"];
             $pruefung= $row["pruefung"];
       
             array_push($data, array("id"=>$id, "name"=>$name, "vorname" =>$vorname, "nutzername"=>$nutzer, 
-                                     "ausbildungsart"=>$ausbildungsart,"fachrichtung"=>$fachrichtung, "id_quiz-art"=>$idquizart, "pruefung"=>$pruefung));
+                                     "ausbildungsart"=>$ausbildungsart, "ausbilder"=>$ausbilder, "fachrichtung"=>$fachrichtung, "id_quiz_art"=>$idquizart, "pruefung"=>$pruefung));
           }
   
       genJson($data);
@@ -36,8 +37,9 @@ function getAzubis ($connection) {
 
 ///////// CREATE
 function createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname) {
+  
   $sqlStmt = "INSERT into azubis(nutzername, passwort, vorname, name, fk_ausbilder, fk_ausbildungsart, fk_fachrichtung) 
-  values ('$nutzername', '$pw', '$vorname', '$name', '$ausbilder', '$ausbildungsart', '$fachrichtung')";
+              values ('$nutzername', '$pw', '$vorname', '$name', '$ausbilder', '$ausbildungsart', '$fachrichtung')";
 
   if (!$connection->query($sqlStmt)){
     echo mysqli_error($connection);
@@ -83,5 +85,13 @@ function updateAzubi($connection, $args) {
   closeConnection($connection); //Verbindung schließen 
 } // FUNKTIONS ENDE
 
+// DELETE
+function deleteAzubi($connection, $IDaz) {
+  $sqlStmt = "DELETE FROM azubis WHERE id = '$IDaz'";
 
+  if (!$connection->query($sqlStmt)){
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
+}
 ?>

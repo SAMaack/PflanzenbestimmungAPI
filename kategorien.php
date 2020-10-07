@@ -37,10 +37,10 @@ function createKategorie($connection, $kat_name) {
     closeConnection($connection);
 }
 
-  //////// UPDATE - TODO
+  //////// UPDATE
   function updateKategorie($connection, $id, $kat_name) {
     $sqlStmt = "UPDATE p_kategorien SET kat_name = '$kat_name'
-                WHERE id = 'id'";
+                WHERE id = '$id'";
 
     if (!$connection->query($sqlStmt)) {
       echo mysqli_error($connection);

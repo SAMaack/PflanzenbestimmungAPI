@@ -13,9 +13,11 @@ function getAdmins ($connection) {
 
             $id = $row["id"];
             $nutzer = $row["nutzername"];
+            $vorname = $row["vorname"];
+            $name = $row["name"];
             $berflag = $row["berflag"];
     
-            array_push($data,array("id"=>$id, "nutzername"=>$nutzer, "berflag"=>$berflag));
+            array_push($data,array("id"=>$id, "nutzername"=>$nutzer, "vorname"=>$vorname, "name"=>$name, "berflag"=>$berflag));
         }
       
         $result->free();
@@ -28,27 +30,38 @@ function getAdmins ($connection) {
 
 //CREATE
 
-function createAdmin($connection, $nutzername, $pw) {
-  $sqlStmt = "INSERT INTO admins (nutzername, passwort) 
-              VALUES ('$nutzername', '$pw')";
+function createAdmin($connection, $nutzername, $pw, $vorname, $name) {
+  $sqlStmt = "INSERT INTO admins (nutzername, passwort, vorname, name) 
+              VALUES ('$nutzername', '$pw', '$vorname', '$name')";
 
-              //Error-Abfrage?
-  $connection->query($sqlStmt);
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
   closeConnection($connection);
 }
 
 //UPDATE
 
-function updateAdmin($connection, $uID, $nutzername, $pw) {
+function updateAdmin($connection, $uID, $nutzername, $pw, $vorname, $name) {
   $sqlStmt = "UPDATE admins
-              SET nutzername = '$nutzername', passwort = '$pw'
+              SET nutzername = '$nutzername', passwort = '$pw', vorname = '$vorname', name = '$name'
               WHERE id = '$uID'";
               
-              //Error-Abfrage?
-  $connection->query($sqlStmt);
+    if (!$connection->query($sqlStmt)) {
+      echo mysqli_error($connection);
+    }
   closeConnection($connection);
 }
 
 //DELETE
+
+function deleteAdmin($connection, $id_admin) {
+  $sqlStmt = "DELETE FROM admins WHERE '$id_admin'";
+              
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+  closeConnection($connection);
+}
 
 ?>
