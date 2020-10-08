@@ -74,7 +74,8 @@ if ($result = $connection->query($sqlStmt)) {
           $sqlStmt = "SELECT pk.kat_name, se.eingabe, se.korrekt
                       FROM stat_einzel_detail se
                       INNER JOIN p_kategorien pk ON se.fk_kategorie = pk.id
-                      WHERE se.fk_statistik = '$id_stat' AND se.fk_pflanze = '$id_pflanze'";
+                      WHERE se.fk_statistik = '$id_stat' AND se.fk_pflanze = '$id_pflanze' ORDER 
+                      BY fk_kategorie";
 
           $kat = array();
           
@@ -127,14 +128,34 @@ closeConnection($connection);
 
   //////// INSERT - Einzel
   function createStatEinzelDetail($connection, $id_stat, $id_pflanze, $id_kategorie, $eingabe) {
-    $sqlStmt = "INSERT into stat_einzel (fk_statistik, fk_pflanze, benoetigte_zeit) VALUES ('$id_stat', '$id_pflanze')";
 
-    $sqlStmt2 = "INSERT INTO stat_einzel_detail (fk_statistik, fk_pflanze, fk_kategorie, eingabe, korrekt
-    VALUES('$id_stat', '$id_pflanze', '$id_kategorie', '$eingabe', (SELECT antwort from p_antworten WHERE fk_kategorie = '$id_kategorie' AND $fk_pflanze = '$id_pflanze'))";
-                
-    if (!$connection->query($sqlStmt)|| !$connection->query($sqlStmt2)) {
-      echo mysqli_error($connection);
+    $sqlStmt = "SELECT * FROM stat_einzel WHERE fk_pflanze = '$id_pflanze' AND fk_statistik = '$id_stat'";
+
+    if ($result =  $connection->query($sqlStmt)) { //Ob Verbindungseintrag für Pflanze schon besteht.
+      if(mysqli_num_rows($result) < 1) {
+        // Wenn nein, dann einfügen.
+        $sqlStmt = "INSERT into stat_einzel (fk_statistik, fk_pflanze) VALUES ('$id_stat', '$id_pflanze')"; 
+                        
+      }
     }
+
+    // Einfügen von Antwort pro Kategorie pro Pflanze
+    $sqlStmt2 = "INSERT INTO stat_einzel_detail (fk_statistik, fk_pflanze, fk_kategorie, eingabe, korrekt)
+                 VALUES('$id_stat', '$id_pflanze', '$id_kategorie', '$eingabe', (SELECT antwort from p_antworten 
+                 WHERE fk_kategorie = '$id_kategorie' AND fk_pflanze = '$id_pflanze'))";
+   
+   if (mysqli_num_rows($result) < 1) {
+      if (!$connection->query($sqlStmt)|| !$connection->query($sqlStmt2)) {
+      echo mysqli_error($connection);
+      }
+   }
+   else {
+    if (!$connection->query($sqlStmt2)) {
+      echo mysqli_error($connection);
+      }
+   }  
+    $result->free();
+
     closeConnection($connection);
   }
   //////// UPDATE
