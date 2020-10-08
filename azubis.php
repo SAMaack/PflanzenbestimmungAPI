@@ -36,10 +36,10 @@ function getAzubis ($connection) {
   }
 
 ///////// CREATE
-function createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname) {
+function createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname, $pruefung, $quiz) {
   
-  $sqlStmt = "INSERT into azubis(nutzername, passwort, vorname, name, fk_ausbilder, fk_ausbildungsart, fk_fachrichtung) 
-              values ('$nutzername', '$pw', '$vorname', '$name', '$ausbilder', '$ausbildungsart', '$fachrichtung')";
+  $sqlStmt = "INSERT into azubis(nutzername, passwort, vorname, name, fk_ausbilder, fk_ausbildungsart, fk_fachrichtung, pruefung, fk_quiz_art) 
+              values ('$nutzername', '$pw', '$vorname', '$name', '$ausbilder', '$ausbildungsart', '$fachrichtung', '$pruefung', '$quiz')";
 
   if (!$connection->query($sqlStmt)){
     echo mysqli_error($connection);
@@ -50,39 +50,124 @@ function createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $n
 ///////// UPDATE
 function updateAzubi($connection, $args) {
   
-  $sqlStmt = "UPDATE azubis SET ";
+  $sqlStmt = "UPDATE azubis SET";
 
-  for ($i = 1; $i < count($args); $i += 2) {
+  $ausbI = false;
+  $ausbA = false;
+  $quiz = false;
+  $nutzer = false;
+  $pass = false;
+  $name = false;
+  $vname = false;
+  $pruef = false;
+  $fach = false;
+
+  for ($i = 1; $i < count($args); $i++) {
     $i2 = $i + 1; //Zur selektierung von zweitem Paramter.
 
     //Parameter Check
-    if ($args[$i] == 'fk_ausbilder' ||         
-        $args[$i] == 'fk_ausbildungsart' ||
-        $args[$i] == 'fk_quizart' || 
-        $args[$i] == "nutzername" || 
-        $args[$i] == 'passwort' || 
-        $args[$i] == 'name' || 
-        $args[$i] == 'vorname' || 
-        $args[$i] == 'pruefung') {
+    if ($args[$i] == "fk_ausbilder" && !$ausbI) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $ausbI = true;
 
-      //Statement Erweiterung, solange Parameter vorhanden.
-      $sqlStmt .= "$args[$i] = '$args[$i2]'"; //$args[$i] = Ziel | $args[$i2] = Wert  || z.B.: name = Banane  
-    }
-
-    //Addition von Seperator, falls noch mehr Argumente vorhanden.
-    if ($i < count($args) - 2) {
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
       $sqlStmt .= ", ";
-    }
-  }
-  
-  $sqlStmt .= " WHERE id = '$args[0]'";
+      }
+    }         
+    elseif ($args[$i] == "fk_ausbildungsart" && !$ausbA) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $ausbA = true;
 
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.Und 
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "fk_quiz_art" && !$quiz) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $quiz = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "fk_fachrichtung" && !$fach) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $fach = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "nutzername" && !$nutzer) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $nutzer = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "passwort" && !$pass) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $pass = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "name" && !$name) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $name = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+    elseif ($args[$i] == "vorname" && !$vname) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $vname = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    } 
+    elseif ($args[$i] == "pruefung" && !$pruef) {
+      $sqlStmt .= " $args[$i] = '$args[$i2]'";
+      $pruef = true;
+
+      //Addition von Seperator, falls noch mehr Argumente vorhanden.
+      if ($i < count($args) - 2) {
+      $sqlStmt .= ", ";
+      }
+    }
+  }// END FOR
+
+  $ausbI = false;
+  $ausbA = false;
+  $quiz = false;
+  $nutzer = false;
+  $pass = false;
+  $name = false;
+  $vname = false;
+  $pruef = false;
+  $fach = false;
+
+  $sqlStmt .= " WHERE id = '$args[0]'";
+  echo $sqlStmt;
+  
   //Error-Ausgabe, falls nicht Erfolgreich
   if (!$connection->query($sqlStmt)){
     echo mysqli_error($connection);     
   }
 
-  closeConnection($connection); //Verbindung schließen 
+  closeConnection($connection); //Verbindung schließen  
 } // FUNKTIONS ENDE
 
 // DELETE

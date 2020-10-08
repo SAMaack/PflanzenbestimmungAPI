@@ -75,36 +75,44 @@ switch ($method) {
     $pw = $_POST['PW'];
     $name = $_POST['Name'];
     $vorname = $_POST['Vorname'];
+    $pruefung = $_POST['Pruefung'];
+    $quizart = $_POST['IDqa'];
 
-    createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname);
+    createAzubi($connection, $ausbilder, $ausbildungsart, $fachrichtung, $nutzername, $pw, $name, $vorname, $pruefung, $quizart);
   break;
 
   case 'updateAzubi':   
     $args = array();
-    foreach($_POST as $key => $value) {  // Als erster Parameter wird die ID des Azubis erwartet, danach dass oder die Ziele und Werte
-        if ($key = 'IDab') {
-          array_push($args, "fk_ausbilder", $_POST['IDab']);
+
+    array_push($args, $_POST['IDaz']);
+    foreach($_POST as $key => $value) {
+      
+        if ($key == "IDab") {
+          array_push($args, "fk_ausbilder", $value);
         }
-        else if($key = 'IDaa') {
-          array_push($args, "fk_ausbildungsart", $_POST['IDaa']);
+        elseif($key == 'IDaa') {
+          array_push($args, "fk_ausbildungsart", $value);
         }
-        else if($key = 'IDqa') {
-          array_push($args, "fk_quizart", $_POST['IDqa']);
+        elseif($key =='IDqa') {
+          array_push($args, "fk_quiz_art", $value);
         }
-        else if($key = 'User') {
-          array_push($args, "nutzername", $_POST['User']);
+        elseif($key == 'IDf') {
+          array_push($args, "fk_fachrichtung", $value);
         }
-        else if($key = 'PW') {
-          array_push($args, "nutzername", $_POST['PW']);
+        elseif($key == 'User') {
+          array_push($args, "nutzername", $value);
         }
-        else if($key = 'Name') {
-          array_push($args, "name", $_POST['Name']);
+        elseif($key == 'PW') {
+          array_push($args, "passwort", $value);
         }
-        else if($key = 'Vorname') {
-          array_push($args, "vorname", $_POST['Vorname']);
+        elseif($key == 'Name') {
+          array_push($args, "name", $value);
         }
-        else if($key = 'Bool_Pruefung') {
-          array_push($args, "pruefung", $_POST['Bool_Pruefung']);
+        elseif($key == 'Vorname') {
+          array_push($args, "vorname", $value);
+        }
+        elseif($key == 'Pruefung') {
+          array_push($args, "pruefung", $value);
         }
     }; 
 
