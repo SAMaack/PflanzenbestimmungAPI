@@ -13,9 +13,12 @@ function getKategorien($connection) {
 
             $id = $row["id"];
             $katName = $row["kat_name"];
-            $abfrage = $row["abfrage"];
-
-        array_push($data,array("id"=>$id, "kategorie"=>$katName, "abfrage"=>$abfrage));
+            $gala = $row["anzeige_gala"];
+            $zier = $row["anzeige_zier"];
+            $werker = $row["werker_gewertet"];
+            $imquiz = $row["im_quiz"];
+      
+        array_push($data,array("id"=>$id, "kategorie"=>$katName, "anzeige_gartenlandschaftsbau"=>$gala, "anzeige_ziergartenbau"=>$zier, "werker_gewertet"=>$werker, "im_quiz"=>$imquiz));
       }
       
       $result->free();
@@ -27,22 +30,21 @@ function getKategorien($connection) {
 }
 
   //////// INSERT
-function createKategorie($connection, $kat_name) {
-    $sqlStmt = "INSERT INTO p_kategorien (kat_name) 
-                VALUES ('$kat_name')";
+function createKategorie($connection, $kat_name, $bool_gala, $bool_zier, $werker, $imquiz) {
+  $sqlStmt = "INSERT INTO p_kategorien (kat_name, anzeige_gala, anzeige_zier, werker_gewertet, im_quiz) 
+                VALUES ('$kat_name', '$bool_gala','$bool_zier', '$werker', '$imquiz')";
 
-    if (!$connection->query($sqlStmt)) {
-      echo mysqli_error($connection);
-    }
-    closeConnection($connection);
+  if (!$connection->query($sqlStmt)) {
+    echo mysqli_error($connection);
+  }
+closeConnection($connection);
 }
 
   //////// UPDATE
-  function updateKategorie($connection, $id, $kat_name) {
-    $sqlStmt = "UPDATE p_kategorien SET kat_name = '$kat_name'
+  function updateKategorie($connection, $id, $kat_name, $bool_gala, $bool_zier, $werker, $imquiz) {
+    $sqlStmt = "UPDATE p_kategorien SET kat_name = '$kat_name', anzeige_gala = '$bool_gala', anzeige_zier = '$bool_zier', werker_gewertet = '$werker', im_quiz = '$imquiz'
                 WHERE id = '$id'";
-
-    if (!$connection->query($sqlStmt)) {
+    if (!$connection->query($sqlStmt) && !$connection->query($sqlStmt2)) {
       echo mysqli_error($connection);
     }
     closeConnection($connection);

@@ -16,7 +16,7 @@ function getPflanzen($connection) {
         $zier = $row["zierbau"];
         $gala = $row["galabau"];
 
-        $sqlStmt2 = "SELECT pk.id as id_kat, pk.kat_name, pk.abfrage, pa.antwort FROM p_antworten pa
+        $sqlStmt2 = "SELECT pk.id as id_kat, pk.kat_name, pk.anzeige_zier, pk.anzeige_gala, pk.werker_gewertet, pk.im_quiz, pa.antwort FROM p_antworten pa
                     INNER JOIN p_kategorien pk
                     ON pk.id = pa.fk_kategorie
                     WHERE fk_pflanze = '$id'";
@@ -28,14 +28,18 @@ function getPflanzen($connection) {
 
             $idkat = $row["id_kat"];
             $katname = $row["kat_name"];
-            $abfrage = $row["abfrage"];
             $antwort = $row["antwort"];
+            $anzeige_zier = $row["anzeige_zier"];
+            $anzeige_gala = $row["anzeige_gala"];
+            $wertung = $row["werker_gewertet"];
+            $imquiz = $row["im_quiz"];
 
-            array_push($antworten, array("kategorie_id"=>$idkat, "kategorie_name"=>$katname, "abfrage"=>$abfrage, "antwort"=>$antwort));
+            array_push($antworten, array("kategorie_id"=>$idkat, "antwort"=>$antwort, "kategorie_name"=>$katname, 
+                                        "anzeige_zier"=>$anzeige_zier, "anzeige_gala"=>$anzeige_gala, "wertung_werker"=>$wertung, "im_quiz"=>$imquiz));
           }
         }
 
-        array_push($data, array("id_pflanze"=> $id, "zierpflanzenbau"=>$zier, "gartenlandschaftsbau"=>$gala, $antworten));
+        array_push($data, array("id_pflanze"=> $id, "zierpflanzenbau"=>$zier, "gartenlandschaftsbau"=>$gala, "kategorien"=>$antworten));
       }
       genJson($data); //Verarbeitung zu json
     }
@@ -157,27 +161,6 @@ function getPBilder($connection, $id_pflanze) {
   closeConnection($connection);
 }
 
-/////// ABFRAGE PFLANZEN BILDER
-function testGetPBilder($connection, $id_pflanze) {
-  $sqlStmt = "SELECT * FROM p_bilder WHERE fk_pflanze = '$id_pflanze'";
-
-  $data = array();
-
-  if ($result = $connection->query($sqlStmt)) {
-    while ($row = $result->fetch_assoc()) {
-      $id = $row["id"];
-      $bild = $row["bild"];
-
-      echo '<img src="data:image/jpeg;base64,'.base64_encode($bild) .'" />';
-    }
-
-  }
-  else {
-    echo mysqli_error($connection);
-  }
-  $result->free();
-  closeConnection($connection);
-}
 
 //////// INSERT
 function createPBild($connection, $id_pflanze, $bild) {

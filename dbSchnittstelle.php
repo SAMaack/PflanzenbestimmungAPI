@@ -133,13 +133,21 @@ switch ($method) {
 
   case 'createKategorie':
     $kat_name  = $_POST['Kategorie'];
-    createKategorie($connection, $kat_name);
+    $gala = $_POST['AnzeigeGala'];
+    $zier = $_POST['AnzeigeZier'];
+    $werker = $_POST['WertungWerker'];
+    $imQuiz = $_POST['ImQuiz'];
+
+    createKategorie($connection, $kat_name, $gala, $zier, $werker, $imQuiz);
   break;
 
   case 'updateKategorie':
     $id  = $_POST['IDk'];
     $kat_name  = $_POST['Kategorie'];
-    updateKategorien($connection, $id, $kat_name);
+    $gala = $_POST['AnzeigeGala'];
+    $zier = $_POST['AnzeigeGala'];
+    $imQuiz = $_POST['ImQuiz'];
+    updateKategorien($connection, $id, $kat_name, $gala, $zier, $werker, $imQuiz);
   break; 
 
   case 'deleteKategorie':
@@ -156,7 +164,7 @@ switch ($method) {
   case 'createPflanze':
     $args = array();
     foreach($_POST as $key => $value) {
-      if (!$key = 'method') {
+      if ($key != 'method') {
         array_push($args, $_POST[$key]);
       }
     }; 
