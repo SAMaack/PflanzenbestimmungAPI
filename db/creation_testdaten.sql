@@ -1,3 +1,5 @@
+drop database if exists pflanzenbestimmung;
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -20,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`admins` (
   `passwort` VARCHAR(64) NOT NULL,
   `berflag` INT NOT NULL DEFAULT 2,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -30,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`ausbildungsart` (
   `id` INT UNSIGNED UNIQUE NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -41,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`quiz_art` (
   `name` VARCHAR(45) UNIQUE NOT NULL,
   `groeße` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -51,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`fachrichtung` (
   `id` INT UNSIGNED NOT NULL UNIQUE AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL UNIQUE,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -85,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`azubis` (
     FOREIGN KEY (`fk_fachrichtung`)
     REFERENCES `pflanzenbestimmung`.`fachrichtung` (`id`)
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -96,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`pflanze` (
   `zierbau` TINYINT UNSIGNED NOT NULL,
   `galabau` TINYINT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -110,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`p_kategorien` (
   `werker_gewertet` TINYINT NOT NULL,
   `im_quiz` TINYINT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -131,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`p_antworten` (
     REFERENCES `pflanzenbestimmung`.`p_kategorien` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -147,7 +149,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`p_bilder` (
     REFERENCES `pflanzenbestimmung`.`pflanze` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 -- -----------------------------------------------------
 -- Table `pflanzenbestimmung`.`statistik`
@@ -168,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`statistik` (
   CONSTRAINT `stat-pflanze`
     FOREIGN KEY (`fk_beste_pflanze`)
     REFERENCES `pflanzenbestimmung`.`pflanze` (`id`))
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -188,7 +190,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`stat_einzel` (
     REFERENCES `pflanzenbestimmung`.`statistik` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -206,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`stat_einzel_detail` (
     REFERENCES `pflanzenbestimmung`.`stat_einzel` (`fk_statistik`, `fk_pflanze`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
@@ -228,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`abgefragt` (
     REFERENCES `pflanzenbestimmung`.`pflanze` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -249,7 +251,7 @@ CREATE TABLE IF NOT EXISTS `pflanzenbestimmung`.`quiz_p_zuweisung` (
     REFERENCES `pflanzenbestimmung`.`pflanze` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
-ENGINE = InnoDB
+ENGINE = MyISAM
 DEFAULT CHARACTER SET = utf8;
 
 SET SQL_MODE=@OLD_SQL_MODE;
@@ -270,10 +272,10 @@ INSERT INTO fachrichtung (name) VALUES ("Zierpflanzensbau");
 INSERT INTO quiz_art (name, groeße) VALUES ("Maxi-Quiz", 100);
 INSERT INTO quiz_art (name, groeße) VALUES ("Mikro-Quiz", 10);
 
-
--- azubis ------------------------
+-- OPTIONAL
+-- admin -------------------------
 INSERT INTO admins (nutzername, vorname, name, passwort, berflag) VALUES ("TestAdmin", "Test", "Admin", "41344d1c296c38c21a90268b3a88a20e25be38d6e3a0680d0eca3df9e6c69651", "2"); --  First Admin
-
+-- azubis ------------------------
 INSERT into azubis(nutzername, passwort, vorname,  name, fk_ausbilder, fk_ausbildungsart, fk_fachrichtung, fk_quiz_art) 
 values ("SysUserA", "f6b05dbfd63c14a30efb92329c246f85b33f4ad04c040798b0512e2a39c1471b", "Gala", "Voll", 1, 
 (SELECT id from ausbildungsart WHERE name = "Vollzeit"), 
