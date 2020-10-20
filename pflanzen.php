@@ -126,6 +126,71 @@ function createPflanze($connection, $args) {
   closeConnection($connection); //Verbindung schließen
 } // FUNKTIONS ENDE
 
+
+////// 	AKTUALISIEREN VON EINER PFLANZE UND DEREN ANTWORTEN
+function updatePflanze($connection, $args) {
+
+  $sqlLock  = "LOCK TABLES p_antworten WRITE, pflanze WRITE";  //Table sperren, damit dir LAST_INSERT_ID nicht gleich überschrieben wird.
+  $sqlUnlock = "UNLOCK TABLES";
+  $sqlStartTransaction = "START TRANSACTION";
+  $sqlCommit = "COMMIT";
+
+  $id = $args[0];
+
+  $sqlUpdate = "UPDATE pflanze SET galabau = '$args[1]', zierbau = '$args[2]' WHERE id = '$id'";
+  $sqlDelete = "DELETE FROM p_antworten WHERE fk_pflanze = $id";
+
+  //Sperrung von Tabelle und Start von Transaction
+  if ($connection->query($sqlLock) && $connection->query($sqlStartTransaction)) {
+    //Atkualisieren von der Pflanze an sich
+    if ($connection->query($sqlUpdate)) {
+      //Entfernen alter Einträge
+      if ($connection->query($sqlDelete)) {
+        //Statement vorbereitung
+        $sqlStmt2 = "INSERT INTO p_antworten (fk_pflanze, fk_kategorie, antwort) VALUES ";
+        
+        for ($i = 3; $i < count($args); $i = $i+2) {
+
+          $i2 = $i + 1; 
+          $sqlStmt2 .= "('$id', '$args[$i]', '$args[$i2]')";  //Statement erweiterung, solange Statements vorhanden
+
+          if ($i < count($args) - 2) {
+            $sqlStmt2 .= ",";
+          }
+        }
+
+        //Ausführung von Statement 2, Einfügung von Antworten
+        if ($connection->query($sqlStmt2)) {
+          //Entsperren von Table
+          if ($connection->query($sqlUnlock)) {
+            //Commit
+            if(!$connection->query($sqlCommit)) {
+              echo mysqli_error($connection); //Error
+            }
+          }
+          else {
+            echo mysqli_error($connection); //Error
+          }
+        }
+        else {
+            echo mysqli_error($connection); //Error   
+        }
+      }
+      else {
+        echo mysqli_error($connection); //Error   
+      }
+    }
+    else {
+      echo mysqli_error($connection); //Error   
+    }
+  }
+  else {
+    echo mysqli_error($connection); //Error
+  }
+
+  closeConnection($connection); //Verbindung schließen
+} // FUNKTIONS ENDE
+
 /////// PFLANZE LÖSCHEN
 
 function deletePflanze($connection, $IDp) {

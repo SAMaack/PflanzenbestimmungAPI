@@ -17,26 +17,28 @@ INCLUDE ('ausbildungsart.php');
 //getFachrichtungen($connection);
 //getAusbildungsart($connection);
 
-//getPBilder($connection, 1);
+//getPBilder($connection, 3);
 
-//getPflanzen($connection);
+getPflanzen($connection);
 //getQuizPZuweisung($connection, 1);
 
 //getLogin($connection, "BeispielAdmin", "BeispielPasswort");
 
 //getAbgefragt($connection, 4);
 
-getAzubis($connection);
+
+//getAzubis($connection);
 //getAdmins($connection);
 
 //$args = array();
-//array_push($args, 5, "nutzername", "UpdateTest", "passwort", "test");
+//array_push($args, 5, "nutzername", "UpdateTest", "fk_ausbilder", 1, "pruefung", 1, "fk_quizart", 2 );
 //updateAzubi($connection, $args);
 //createAzubi($connection,,,,,,,,,);
 
-//getStatistik($connection, 1);
-//testStat($connection, 1);
-//getStatDetails($connection, 1);
+//getStatistik($connection, 98);
+//getStatList($connection, 1);
+//getStatistik($connection, 91);
+
 
 //createAdmin($connection, "ApiTest", "Test");
 //updateAdmin($connection, 2, "UpdateTest", "Test");

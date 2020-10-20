@@ -49,11 +49,16 @@ switch ($method) {
   case 'updateAdmin':
     $id_admin  = $_POST['IDad'];
     $username = $_POST['User'];
-    $pw = $_POST['PW'];
     $name = $_POST['Name'];
     $vorname = $_POST['Vorname'];
-
-    updateAdmin($connection, $id_admin, $username, $pw, $name, $vorname);
+	
+	if(isset($_POST['PW'])){
+		$pw = $_POST['PW'];
+		updateAdmin($connection, $id_admin, $username, $pw, $name, $vorname); 
+	}
+	else{
+		updateAdminWithoutPassword($connection, $id_admin, $username, $name, $vorname); 
+	}
   break;
 
   case 'deleteAdmin':
@@ -167,9 +172,19 @@ switch ($method) {
       if ($key != 'method') {
         array_push($args, $_POST[$key]);
       }
-    }; 
+    };
+	createPflanze($connection, $args);
+  break;
+	
+  case 'updatePflanze':
+	$args = array();
+    foreach($_POST as $key => $value) {
+      if ($key != 'method') {
+        array_push($args, $_POST[$key]);
+      }
+    };
 
-    createPflanze($connection, $args);
+    updatePflanze($connection, $args);
   break;
 
   case 'deletePflanze':
@@ -301,6 +316,9 @@ switch ($method) {
     
     updateAbgefragt($connection, $id_azubi, $id_pflanze, $counter, $gelernt);
   break;
+  
+  default:
+	echo "Diese Methode existiert nicht!";
 } 
 
 //Umwandeln und Ausgabe von Daten als JSON

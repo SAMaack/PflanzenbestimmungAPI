@@ -53,6 +53,17 @@ function updateAdmin($connection, $uID, $nutzername, $pw, $vorname, $name) {
   closeConnection($connection);
 }
 
+function updateAdminWithoutPassword($connection, $uID, $nutzername, $vorname, $name) {
+  $sqlStmt = "UPDATE admins
+              SET nutzername = '$nutzername', vorname = '$vorname', name = '$name'
+              WHERE id = '$uID'";
+              
+    if (!$connection->query($sqlStmt)) {
+      echo mysqli_error($connection);
+    }
+  closeConnection($connection);
+}
+
 //DELETE
 
 function deleteAdmin($connection, $id_admin) {

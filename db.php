@@ -5,10 +5,10 @@ error_reporting($reportingLevel);
 $connection = getDBConnection();
 function getDBConnection(){
   //Einstellungen der Datenbank
-  $dbusername = 'root';         //Benutzername
+  $dbusername = '';         //Benutzername
   $dbpassword = '';             //Passwort
-  $dburl='localhost';           //URL
-  $dbname='Pflanzenbestimmung'; //Datenbankname
+  $dburl='';           //URL
+  $dbname=''; //Datenbankname
 
   $fehler1 = "Fehler 1: Fehler beim aufbauen der Datenbankverbindung!";
     $link = mysqli_connect($dburl, $dbusername, $dbpassword,$dbname);
