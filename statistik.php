@@ -59,8 +59,6 @@ if ($result = $connection->query($sqlStmt)) {
       $zeit = $row["quizzeit"];
       $id_b_pflanze = $row["fk_beste_pflanze"];
 
-      strtotime(date('Y-m-d H:i:s') . ' + 7 hours'); // HIER MUSS IRGENDWO EINE ZEIT KONVERTIERUNG EINGEFÜGT WERDEN. DB Abfrage der Timezone?
-
       // STATEMENT VORBEREITUNG
       $sqlStmt = "SELECT fk_pflanze
                   FROM stat_einzel

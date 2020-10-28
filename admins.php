@@ -67,12 +67,18 @@ function updateAdminWithoutPassword($connection, $uID, $nutzername, $vorname, $n
 //DELETE
 
 function deleteAdmin($connection, $id_admin) {
-  $sqlStmt = "DELETE FROM admins WHERE '$id_admin'";
-              
-  if (!$connection->query($sqlStmt)) {
+  $sqlStmt = "UPDATE azubis 
+              SET fk_ausbilder = 1 
+              WHERE fk_ausbilder = $id_admin";                          
+
+  $sqlStmt1 = "DELETE FROM admins 
+               WHERE id = $id_admin";
+
+  if (!$connection->query($sqlStmt) || !$connection->query($sqlStmt1)) {
     echo mysqli_error($connection);
   }
-  closeConnection($connection);
+  closeConnection($connection);//*/
+
 }
 
 ?>

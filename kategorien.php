@@ -44,7 +44,7 @@ closeConnection($connection);
   function updateKategorie($connection, $id, $kat_name, $bool_gala, $bool_zier, $werker, $imquiz) {
     $sqlStmt = "UPDATE p_kategorien SET kat_name = '$kat_name', anzeige_gala = '$bool_gala', anzeige_zier = '$bool_zier', werker_gewertet = '$werker', im_quiz = '$imquiz'
                 WHERE id = '$id'";
-    if (!$connection->query($sqlStmt) && !$connection->query($sqlStmt2)) {
+    if (!$connection->query($sqlStmt)) {
       echo mysqli_error($connection);
     }
     closeConnection($connection);

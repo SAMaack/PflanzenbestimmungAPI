@@ -151,13 +151,14 @@ switch ($method) {
     $kat_name  = $_POST['Kategorie'];
     $gala = $_POST['AnzeigeGala'];
     $zier = $_POST['AnzeigeGala'];
+    $werker = $_POST['WertungWerker'];
     $imQuiz = $_POST['ImQuiz'];
-    updateKategorien($connection, $id, $kat_name, $gala, $zier, $werker, $imQuiz);
+    updateKategorie($connection, $id, $kat_name, $gala, $zier, $werker, $imQuiz);
   break; 
 
   case 'deleteKategorie':
     $id  = $_POST['IDk'];
-    deleteKategorien($connection, $id);
+    deleteKategorie($connection, $id);
   break;
 
   //////// PFLANZEN //////// 
@@ -275,21 +276,17 @@ switch ($method) {
   break;
 
   //////// QUIZ - PLANZEN - ZUWEISUNG ////////
-  case 'getQuizPZuweisung':
-    $id_azubi = $_POST['IDaz'];
-    getQuizPZuweisung($connection, $id_azubi);
-  break;
 
   case 'createQuizPZuweisung':
-    $id_azubi = $_POST['IDaz'];
+    $id_quiz_art = $_POST['IDqa'];
     $id_pflanze = $_POST['IDp'];
-    createQuizPZuweisung($connection, $id_azubi, $id_pflanze);
+    createQuizPZuweisung($connection, $id_quiz_art, $id_pflanze);
   break;
 
   case 'deleteQuizPZuweisung':
-    $id_azubi = $_POST['IDa'];
+    $id_quiz_art = $_POST['IDqa'];
     $id_pflanze = $_POST['IDp'];
-    deleteQuizPZuweisung($connection, $id_azubi, $id_pflanze);
+    deleteQuizPZuweisung($connection, $id_quiz_art, $id_pflanze);
   break;
 
   case 'getAbgefragt':

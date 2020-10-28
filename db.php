@@ -5,10 +5,10 @@ error_reporting($reportingLevel);
 $connection = getDBConnection();
 function getDBConnection(){
   //Einstellungen der Datenbank
-  $dbusername = '';         //Benutzername
-  $dbpassword = '';             //Passwort
-  $dburl='';           //URL
-  $dbname=''; //Datenbankname
+  $dbusername = 'id15204888_ittsbw';         //Benutzername
+  $dbpassword = 'Citrix150100+';             //Passwort
+  $dburl='localhost';           //URL
+  $dbname='id15204888_pflanzenbestimmung'; //Datenbankname
 
   $fehler1 = "Fehler 1: Fehler beim aufbauen der Datenbankverbindung!";
     $link = mysqli_connect($dburl, $dbusername, $dbpassword,$dbname);
